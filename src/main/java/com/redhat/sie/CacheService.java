@@ -11,10 +11,14 @@ import java.util.UUID;
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
+import javax.inject.Inject;
 
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.infinispan.client.hotrod.RemoteCache;
 import org.infinispan.client.hotrod.RemoteCacheManager;
+import org.infinispan.client.hotrod.configuration.ClientIntelligence;
 import org.infinispan.client.hotrod.configuration.ConfigurationBuilder;
+import org.infinispan.client.hotrod.configuration.SaslQop;
 import org.infinispan.commons.api.CacheContainerAdmin;
 import org.infinispan.commons.util.CloseableIterator;
 import org.slf4j.Logger;
@@ -29,12 +33,26 @@ public class CacheService {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger("CacheService");
 	
-	private RemoteCacheManager cacheManager;
+	// @Inject
+	private RemoteCacheManager cacheManager; 
+	
 	private RemoteCache<String, Object> cache;
 	private Map<String, RemoteCache<String, Object>> remoteCaches = new HashMap<String, RemoteCache<String, Object>>();
 	
+	@ConfigProperty(name = "infinispan.host")
+	String host;
+	
+	@ConfigProperty(name = "infinispan.port")
+	int port;
+	
+	@ConfigProperty(name = "infinispan.user")
+	String user;
+	
+	@ConfigProperty(name = "infinispan.password")
+	String password;
+	
 	void onStart(@Observes StartupEvent ev) {
-        LOGGER.info("Starting Quarkus app...");        
+        LOGGER.info("Starting Quarkus app... " + cacheManager.getConfiguration().toString());
     }
 	
 	@PostConstruct
@@ -43,12 +61,26 @@ public class CacheService {
         
         ConfigurationBuilder builder = new ConfigurationBuilder();
         
-        builder.marshaller(new org.infinispan.commons.marshall.ProtoStreamMarshaller())
+        builder
+        	.marshaller(new org.infinispan.commons.marshall.ProtoStreamMarshaller())
+        	.addServer()
+        		.host(host)
+        		.port(port)
+        		.version(org.infinispan.client.hotrod.ProtocolVersion.PROTOCOL_VERSION_30)
+        	.clientIntelligence(ClientIntelligence.BASIC)	
+        	.security()
+	            .authentication().enable()
+	               .username(user)
+	               .password(password)
+	               //.serverName("example-infinispan")
+	               .saslQop(SaslQop.AUTH)
+	               .saslMechanism("DIGEST-MD5")
     		.statistics()
-    		.disable()
+    			.disable()
     		.jmxDomain("org.example");
     
         cacheManager = new RemoteCacheManager(builder.build());
+        
     }
 	
 	public boolean createCache(String name, String type) {
@@ -79,7 +111,7 @@ public class CacheService {
         	
         	// DataRecord record = new DataRecord(UUID.randomUUID().toString(), "RTU00001", Instant.now().toEpochMilli(), 192, new Random().nextDouble() * 100);
         	// cache.put(record.getSignalSource(), record);
-        	//cache.put(UUID.randomUUID().toString(), "SourceSignal$0098;RTU00001;98798798;192;20.98237");
+        	cache.put(UUID.randomUUID().toString(), "SourceSignal$0098;RTU00001;98798798;192;20.98237");
         }
         long end = Instant.now().toEpochMilli();
         LOGGER.info("fill Cache Time:" + (end - start));
