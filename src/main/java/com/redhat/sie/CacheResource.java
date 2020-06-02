@@ -15,8 +15,8 @@ public class CacheResource {
 	CacheService cacheService;
     
     @GET
-    @Path("/build")
-    // @Produces(MediaType.APPLICATION_JSON)
+    @Path("/create")
+    @Produces(MediaType.APPLICATION_JSON)
     public Response createCache(@QueryParam(value = "type") String type, @QueryParam(value = "name") String name) {
     	return Response.ok(cacheService.createCache(name, type)).build();
     }
@@ -31,15 +31,30 @@ public class CacheResource {
     @GET
     @Path("/fill")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response fillCache(@QueryParam(value = "entries") int entries) {
-        return Response.ok(cacheService.fillCache(entries)).build();
+    public Response fillCache(@QueryParam(value = "entries") int entries, @QueryParam(value = "name") String name) {
+        return Response.ok(cacheService.fillCache(entries, name)).build();
     }
     
     @GET
     @Path("/dump")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response dumpCache() {
-        return Response.ok(cacheService.dumpCache()).build();
+    public Response dumpCache(@QueryParam(value = "name") String name) {
+        return Response.ok(cacheService.dumpCache(name)).build();
+    }
+    
+    @GET
+    @Path("/clear")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response clearCache(@QueryParam(value = "name") String name) {
+        return Response.ok(cacheService.clearCache(name)).build();
+    }
+    
+    @GET
+    @Path("/segments")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getSegments(@QueryParam(value = "name") String name) {
+    	cacheService.getCacheSegments(name);
+        return Response.status(200).build();
     }
     
     
