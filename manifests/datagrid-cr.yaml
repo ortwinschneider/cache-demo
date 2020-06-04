@@ -1,0 +1,23 @@
+apiVersion: infinispan.org/v1
+kind: Infinispan
+metadata:
+  name: example-infinispan
+spec:
+  container:
+    cpu: 2000m
+    extraJvmOpts: >-
+      -XX:NativeMemoryTracking=summary -server -Xms4096m -Xmx4096m -XX:+UseG1GC
+      -Xmn1G -XX:+UseStringDeduplication
+    memory: 4Gi
+  expose:
+    nodePort: 30578
+    type: LoadBalancer
+  logging:
+    categories:
+      org.infinispan: debug
+      org.jgroups: debug
+  replicas: 2
+  service:
+    container:
+      storage: 2Gi
+    type: DataGrid

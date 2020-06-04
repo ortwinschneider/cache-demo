@@ -1,0 +1,25 @@
+kind: LocalConfig
+apiversion: odo.openshift.io/v1alpha1
+ComponentSettings:
+  Type: java
+  SourceLocation: ./
+  SourceType: local
+  Ports:
+  - 8778/TCP
+  - 8080/TCP
+  - 8443/TCP
+  Application: app
+  Project: oschneid-jdg
+  Name: cache-demo-odo
+  MinMemory: 3000M
+  MaxMemory: 3000M
+  MinCPU: "4"
+  MaxCPU: "4"
+  Envs:
+  - Name: JAVA_OPTIONS
+    Value: -XX:ActiveProcessorCount=8
+  - Name: JAVA_OPTS
+    Value: -XX:ActiveProcessorCount=8
+  Url:
+  - Name: cache-demo-odo-8080
+    Port: 8080

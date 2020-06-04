@@ -36,6 +36,13 @@ public class CacheResource {
     }
     
     @GET
+    @Path("/fillConcurrent")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response fillConcurrentCache(@QueryParam(value = "entries") int entries, @QueryParam(value = "name") String name, @QueryParam(value = "threads") int threads) {
+        return Response.ok(cacheService.fillCacheConcurrent(entries, name, threads)).build();
+    }
+    
+    @GET
     @Path("/dump")
     @Produces(MediaType.APPLICATION_JSON)
     public Response dumpCache(@QueryParam(value = "name") String name) {
@@ -43,18 +50,17 @@ public class CacheResource {
     }
     
     @GET
+    @Path("/dumpConcurrent")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response dumpConcurrentCache(@QueryParam(value = "name") String name) {
+        return Response.ok(cacheService.dumpByCacheSegments(name)).build();
+    }
+    
+    @GET
     @Path("/clear")
     @Produces(MediaType.APPLICATION_JSON)
     public Response clearCache(@QueryParam(value = "name") String name) {
         return Response.ok(cacheService.clearCache(name)).build();
-    }
-    
-    @GET
-    @Path("/segments")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getSegments(@QueryParam(value = "name") String name) {
-    	cacheService.getCacheSegments(name);
-        return Response.status(200).build();
     }
     
     
